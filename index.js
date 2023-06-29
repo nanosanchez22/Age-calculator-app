@@ -43,7 +43,7 @@ function calculateAge() {
   } else if (monthInput.value > month) {
     daysOld = day - dayInput.value;
     monthsOld = month - monthInput.value + 11;
-    yearsOld = year - yearInput.value;
+    yearsOld = year - yearInput.value -1;
   } else {
     daysOld = day - dayInput.value;
     monthsOld = month - monthInput.value;

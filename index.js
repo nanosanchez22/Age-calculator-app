@@ -21,52 +21,60 @@ btn.addEventListener("click", function () {
   checkErrors();
 });
 
-function calculateAge() {
-  const date = new Date();
+function getAge(year, month, day) {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentDay = currentDate.getDate();
 
-  let yearsOld = 0;
-  let monthsOld = 0;
-  let daysOld = 0;
+  let yearsOld = currentYear - year;
+  let monthsOld = currentMonth - month;
+  let daysOld = currentDay - day;
 
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-
-  if (dayInput.value > day && monthInput.value > month) {
-    daysOld = day - dayInput.value + 30;
-    monthsOld = month - monthInput.value + 11;
-    yearsOld = year - yearInput.value - 1;
-  } else if (dayInput.value > day) {
-    daysOld = day - dayInput.value + 30;
-    monthsOld = month - monthInput.value;
-    yearsOld = year - yearInput.value;
-  } else if (monthInput.value > month) {
-    daysOld = day - dayInput.value;
-    monthsOld = month - monthInput.value + 11;
-    yearsOld = year - yearInput.value -1;
-  } else {
-    daysOld = day - dayInput.value;
-    monthsOld = month - monthInput.value;
-    yearsOld = year - yearInput.value;
+  if (currentMonth < month || (currentMonth === month && currentDay < day)) {
+    yearsOld--;
+    monthsOld += 12;
   }
 
-  animateCounter(yearOutput, yearsOld);
-  animateCounter(monthOutput, monthsOld);
-  animateCounter(dayOutput, daysOld);
+  if (currentDay < day) {
+    const daysInPreviousMonth = new Date(
+      currentYear,
+      currentMonth - 1,
+      0
+    ).getDate();
+    monthsOld--;
+    daysOld += daysInPreviousMonth;
+  }
+
+  return { years: yearsOld, months: monthsOld, days: daysOld };
+}
+
+function calculateAge() {
+  const dayInputValue = parseInt(dayInput.value);
+  const monthInputValue = parseInt(monthInput.value);
+  const yearInputValue = parseInt(yearInput.value);
+
+  const age = getAge(yearInputValue, monthInputValue, dayInputValue);
+
+  animateCounter(yearOutput, age.years);
+  animateCounter(monthOutput, age.months);
+  animateCounter(dayOutput, age.days);
 }
 
 function animateCounter(element, targetNumber) {
   element.style.opacity = "0";
 
   let currentNumber = 0;
-  const interval = setInterval(() => {
-    currentNumber++;
-    element.innerText = currentNumber;
-    element.style.opacity = "1";
+  const increment = Math.ceil(targetNumber / 100); // Adjust the increment for smoother animation
 
-    if (currentNumber === targetNumber) {
+  const interval = setInterval(() => {
+    currentNumber += increment;
+    if (currentNumber > targetNumber) {
+      currentNumber = targetNumber;
       clearInterval(interval);
     }
+    element.innerText = currentNumber;
+    element.style.opacity = "1";
   }, 20); // Delay between number increments in milliseconds
 }
 
